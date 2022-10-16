@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 //Cross origin  permet de reègler le problème cors qu'on peut avoir avec Angular 13+ quand on fait une requête
-@CrossOrigin
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/ClubManager/eleves")
 @Secured("ROLE_ADMIN")

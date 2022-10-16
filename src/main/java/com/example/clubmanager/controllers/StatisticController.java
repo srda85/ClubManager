@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.http.WebSocket;
 import java.util.List;
 
-@CrossOrigin
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/ClubManager/statistiques")
 @Secured({"ROLE_ADMIN"})
