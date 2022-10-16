@@ -24,7 +24,7 @@ public class SchedulerMail {
     // ttre dans une classe et s'il faut pas déplacer ailleurs le @EnableScheduling
     //MODIFIER LE TIMING
     //Cron (cron = "0 0 6 * * *")
-    @Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "*/30 * * * * *")
     public void testScheduler () {
         System.out.println("MAIL FONCTION");
         List<Abonnement> abonnementsList=abonnementRepository.findAll();
