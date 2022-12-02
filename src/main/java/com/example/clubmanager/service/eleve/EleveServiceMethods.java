@@ -2,13 +2,13 @@ package com.example.clubmanager.service.eleve;
 
 import com.example.clubmanager.models.Abonnement;
 import com.example.clubmanager.models.Eleve;
+import com.example.clubmanager.repositories.AbonnementRepository;
 import com.example.clubmanager.repositories.EleveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.spel.ast.Elvis;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,8 +16,10 @@ import java.util.List;
 public class EleveServiceMethods {
     @Autowired
     EleveRepository eleveRepository;
+    @Autowired
+    AbonnementRepository abonnementRepository;
 
-    private final List<String>statutsEleve= Arrays.asList("Membre du personnel","Pas d'abonnement","En ordre","Pas en ordre");
+    private final List<String>statutsEleve= Arrays.asList("Membre du personnel","Pas d'abonnement","En ordre","Pas en ordre","Absent");
     private final List<String>roleEleve=Arrays.asList("élève","coach");
 
 
@@ -37,15 +39,32 @@ public class EleveServiceMethods {
         }return true;
     }
 
+    private boolean verifSiAboAPlusDunAn(List<Abonnement>abonnementsList){
+        boolean result=false;
+        for (Abonnement abonnement:abonnementsList) {
+            //je vérifie si la fin de l'abonnement précède de 1 la date actuelle et je mets sur true, je le fais pour tous les abos pour pas que ça soit faussé.
+            if(abonnement.getFinAbonnement().isBefore(LocalDate.now().minusYears(1L))){
+                result=true;
+            }
+            else {
+                result =false;
+            }
+        }
+        return result;
+    }
+
     public void miseAjourStatutEleve(Long id){
         Eleve eleveToUpdateStatus=eleveRepository.findById(id).orElseThrow(()->new RuntimeException("Cet élève n'existe pas"));
-        List<Abonnement> abonnementsDeEleveList=eleveToUpdateStatus.getAbonnements();
+        List<Abonnement> abonnementsDeEleveList=abonnementRepository.findAbonnementByEleve_ID(eleveToUpdateStatus.getID());
 
         if (verifStatutSiCoach(eleveToUpdateStatus)){
             eleveToUpdateStatus.setStatut(statutsEleve.get(0));
         }
         else if (abonnementsDeEleveList.isEmpty()) {
             eleveToUpdateStatus.setStatut(statutsEleve.get(1));
+        }
+        else if (verifSiAboAPlusDunAn(abonnementsDeEleveList)){
+            eleveToUpdateStatus.setStatut(statutsEleve.get(4));
         }
         else if (verifSiAbonnementEnOrdre(abonnementsDeEleveList)){
             eleveToUpdateStatus.setStatut(statutsEleve.get(2));
@@ -57,28 +76,17 @@ public class EleveServiceMethods {
     }
 
 
+    //Cron 2 heure du matin tous les jours(0 0 2 * * *)
+    // tt les 30 sec (cron = "*/30 * * * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     public void checkEleveStatusDaily(){
+        System.out.println("Statut checked daily");
 
-        System.out.println("Statut checked");
-        //A checker j'ai du mettre le fetche en EAGER alors que j'aimerais le laisser en LAZY pour économiser de la ressource
-        List<Eleve> eleveList=eleveRepository.findAll();
-        for (Eleve eleve:eleveList) {
-            List<Abonnement>abonnementListEleve=eleve.getAbonnements();
-
-            //Si pas d'abonnement
-            if (eleve.getAbonnements().isEmpty() && eleve.getRole().contains("élève"))
-                eleve.setStatut("Pas d'abonnement");
-            else if (eleve.getRole().contains("coach")) {
-                eleve.setStatut("STAFF MEMBER");
+        List<Eleve>eleveList=eleveRepository.findAll();
+        if (!eleveList.isEmpty()){
+            for (Eleve eleve:eleveList) {
+                miseAjourStatutEleve(eleve.getID());
             }
-            //Si abonnement
-            else {
-                for (Abonnement abonnement:abonnementListEleve) {
-                    if (abonnement.getFinAbonnement().isAfter(LocalDate.now()))eleve.setStatut("En ordre");
-                    else eleve.setStatut("Pas en ordre");
-                }
-            }
-            eleveRepository.saveAndFlush(eleve);
         }
     }
 

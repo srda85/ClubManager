@@ -1,7 +1,6 @@
 package com.example.clubmanager.service.abonnement;
 
 
-import com.example.clubmanager.models.Abonnement;
 import com.example.clubmanager.models.dto.AbonnementDTO;
 import com.example.clubmanager.models.dto.AbonnementUpdateDTO;
 import com.example.clubmanager.models.forms.AbonnementCreateForm;

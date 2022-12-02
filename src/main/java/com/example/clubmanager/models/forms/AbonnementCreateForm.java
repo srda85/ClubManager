@@ -1,6 +1,5 @@
 package com.example.clubmanager.models.forms;
 
-import com.example.clubmanager.models.Eleve;
 import lombok.Data;
 
 import java.time.LocalDate;

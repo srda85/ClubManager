@@ -2,7 +2,6 @@ package com.example.clubmanager.repositories;
 
 import com.example.clubmanager.models.Eleve;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 

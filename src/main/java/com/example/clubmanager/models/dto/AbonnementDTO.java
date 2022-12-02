@@ -1,6 +1,5 @@
 package com.example.clubmanager.models.dto;
 
-import com.example.clubmanager.models.Eleve;
 import lombok.Builder;
 import lombok.Data;
 

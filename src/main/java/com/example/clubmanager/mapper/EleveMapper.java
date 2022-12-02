@@ -2,7 +2,6 @@ package com.example.clubmanager.mapper;
 
 import com.example.clubmanager.models.Abonnement;
 import com.example.clubmanager.models.Eleve;
-import com.example.clubmanager.models.dto.AbonnementDTO;
 import com.example.clubmanager.models.dto.EleveDTO;
 import com.example.clubmanager.models.dto.EleveReducedDataDto;
 import com.example.clubmanager.models.forms.EleveCreateForm;
@@ -13,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Component
 public class EleveMapper {

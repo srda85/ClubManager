@@ -3,7 +3,6 @@ package com.example.clubmanager.email;
 import com.example.clubmanager.models.Abonnement;
 import com.example.clubmanager.repositories.AbonnementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +23,10 @@ public class SchedulerMail {
     // ttre dans une classe et s'il faut pas déplacer ailleurs le @EnableScheduling
     //MODIFIER LE TIMING
     //Cron (cron = "0 0 6 * * *")
-    @Scheduled(cron = "*/30 * * * * *")
+//    (cron = "*/30 * * * * *")
+    @Scheduled(cron="0 0 6 * * *")
     public void testScheduler () {
-        System.out.println("MAIL FONCTION");
+        System.out.println("MAIL FONCTION - 6 heure du matin");
         List<Abonnement> abonnementsList=abonnementRepository.findAll();
         List<Abonnement>abonnementsExpire=abonnementsList
                 .stream()

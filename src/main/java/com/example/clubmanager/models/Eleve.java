@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 //Getter et setter obligatoire mais peuvent être implanté facilement avec @Data de lombock (je pense).
 @Entity(name = "eleves")
@@ -45,6 +44,7 @@ public class Eleve {
     private LocalDate dateCreationFiche;
 
     //Fetch LAZY signifie qu'il chargera les abonnements que sur demande avec getAbo...
+    // Probleme Lazy avec une méthode schedeld.
     //mapped by prend la variable de l'autre coté et va creer une table intermédiaire.
     //Mapped by = listé par ..... Un élève à une collection (liste) d'abonnement
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "eleve", cascade = CascadeType.DETACH)

@@ -112,7 +112,7 @@ public class StatisticScheduler {
 
                 //Montant pas bon
                 statisticQuiDiminue.setMontantsTotalMensuel(statisticQuiDiminue.getMontantsTotalMensuel()-montantADiminuer);
-                statisticQuiDiminue.setNbrInscriptions(statisticQuiDiminue.getNbrInscriptions()-1);
+                statisticQuiDiminue.setNbrInscriptions(statisticQuiDiminue.getNbrInscriptions());
                 statServiceMethods.create(statisticQuiDiminue);
             }
         }

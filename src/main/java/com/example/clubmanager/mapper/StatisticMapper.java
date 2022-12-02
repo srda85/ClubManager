@@ -2,11 +2,9 @@ package com.example.clubmanager.mapper;
 
 import com.example.clubmanager.models.Statistic;
 import com.example.clubmanager.models.dto.StatisticDTO;
-import com.example.clubmanager.models.forms.StatisticCreateForm;
 import org.springframework.stereotype.Component;
 
 import java.text.DateFormatSymbols;
-import java.time.LocalDate;
 
 @Component
 public class StatisticMapper {

@@ -1,15 +1,11 @@
 package com.example.clubmanager.controllers;
 
-import com.example.clubmanager.models.Abonnement;
 import com.example.clubmanager.models.dto.AbonnementDTO;
 import com.example.clubmanager.models.dto.AbonnementUpdateDTO;
 import com.example.clubmanager.models.forms.AbonnementCreateForm;
 import com.example.clubmanager.models.forms.AbonnementUpdateForm;
-import com.example.clubmanager.repositories.AbonnementRepository;
 import com.example.clubmanager.service.abonnement.AboService;
-import com.example.clubmanager.service.eleve.EleveServiceMethods;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,7 +43,7 @@ public class AbonnementController {
     }
 
     @DeleteMapping(value = "{id}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    //@ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteById(@PathVariable Long id){
         service.delete(id);
     }

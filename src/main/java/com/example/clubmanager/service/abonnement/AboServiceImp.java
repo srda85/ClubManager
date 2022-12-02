@@ -18,7 +18,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -70,20 +69,22 @@ public class AboServiceImp implements AboService {
         //Je transforme le formulaire en objet abonnement
         Abonnement abonnement = mapper.toEntity(form);
 
+        if (checkAllAboByEleveId(form))
+            throw new RuntimeException("Création impossible : Certaine date sont déjà occupée");
 
         //Jet Set l'éleve de l'objet grace au formulaire
         abonnement.setEleve(eleveRepository.findById(form.getEleveId())
                 .orElseThrow(()->new RuntimeException("Pas de Correspondance pour EleveID")));
 
         //Réactiver plus tard
-        emailSenderServiceS.send("sceuba@gmail.com",abonnement.getEleve().getEmail(),"Votre nouvel abonnement chez PhoenixADA",
-                "Bonjour "+abonnement.getEleve().getPrenom()+","+
-                "\n\n\n\n Vous avez souscrit à un nouvel abonnement chez PhoenixADA BJJ."+
-                        "\n\n\t Il débute le "+abonnement.getDebutAbonnement().format(DateTimeFormatter.ofPattern("dd-MM-yy"))+
-                        "\n\n\t et il prendra fin le "+abonnement.getFinAbonnement().format(DateTimeFormatter.ofPattern("dd-MM-yy"))+
-                        "\n\n\n\n Toute l'équipe PhoenixADA te remercie."+
-                        "\t\n\n\n\n A bientôt sur le tatami."
-                );
+//        emailSenderServiceS.send("sceuba@gmail.com",abonnement.getEleve().getEmail(),"Votre nouvel abonnement chez PhoenixADA",
+//                "Bonjour "+abonnement.getEleve().getPrenom()+","+
+//                "\n\n\n\n Vous avez souscrit à un nouvel abonnement chez PhoenixADA BJJ."+
+//                        "\n\n\t Il débute le "+abonnement.getDebutAbonnement().format(DateTimeFormatter.ofPattern("dd-MM-yy"))+
+//                        "\n\n\t et il prendra fin le "+abonnement.getFinAbonnement().format(DateTimeFormatter.ofPattern("dd-MM-yy"))+
+//                        "\n\n\n\n Toute l'équipe PhoenixADA te remercie."+
+//                        "\t\n\n\n\n A bientôt sur le tatami."
+//                );
 
         AbonnementDTO abonnementDTO=mapper.toDTO(repository.saveAndFlush(abonnement));
 
@@ -130,18 +131,6 @@ public class AboServiceImp implements AboService {
         return abonnementDTO;
     }
 
-    public void updateForDeleteEleve(Long eleveId){
-        //1. je récupère tous  les abonnements qui correspondent à l'élève à supprimer.
-        List<Abonnement>abonnementList  = repository.findAbonnementByEleve_ID(eleveId);
-        //Pour tous les abonnements de la liste, je SET l'élève sur l'élève CORBEILLE
-        //Ensuite je sauvegarde chacun
-        Eleve eleveCorbeille = eleveRepository.findById(1L).orElseThrow(()->new RuntimeException("Pas de Correspondance pour EleveID"));
-        for (Abonnement abonnement:abonnementList) {
-            abonnement.setEleve(eleveCorbeille);
-        }
-       repository.saveAllAndFlush(abonnementList);
-    }
-
     @Override
     public AbonnementDTO delete(Long id) {
         Abonnement abonnement = repository.findById(id).orElseThrow(() -> new RuntimeException("Abonnement non existant"));
@@ -155,5 +144,44 @@ public class AboServiceImp implements AboService {
 
         return mapper.toDTO(abonnement);
     }
+
+    public void updateForDeleteEleve(Long eleveId){
+        //1. je récupère tous  les abonnements qui correspondent à l'élève à supprimer.
+        List<Abonnement>abonnementList  = repository.findAbonnementByEleve_ID(eleveId);
+        //Pour tous les abonnements de la liste, je SET l'élève sur l'élève CORBEILLE
+        //Ensuite je sauvegarde chacun
+        Eleve eleveCorbeille = eleveRepository.findById(1L).orElseThrow(()->new RuntimeException("Pas de Correspondance pour EleveID"));
+        for (Abonnement abonnement:abonnementList) {
+            abonnement.setEleve(eleveCorbeille);
+        }
+       repository.saveAllAndFlush(abonnementList);
+    }
+
+    private List<Abonnement> getAllEntityByEleveId(Long idEleve){
+        return repository.findAbonnementByEleve_ID(idEleve);
+    }
+
+    private boolean checkAllAboByEleveId(AbonnementCreateForm form){
+        List<Abonnement>abonnementList=getAllEntityByEleveId(form.getEleveId());
+        LocalDate finFormAbo;
+        if (!abonnementList.isEmpty()){
+            for (Abonnement abonnement:abonnementList) {
+                finFormAbo=form.getDebutAbonnement().plusMonths(form.getDureeAbonnement());
+                //si début avant la fin et après le début
+                if (form.getDebutAbonnement().isBefore(abonnement.getFinAbonnement())&&form.getDebutAbonnement().isAfter(abonnement.getDebutAbonnement())){
+                    return true;
+                //si un abonnement se trouve dans la région du nouvel abonnement (cad entre sa date de début et sa date de fin)
+                } else if (form.getDebutAbonnement().isBefore(abonnement.getDebutAbonnement())&&finFormAbo.isAfter(abonnement.getFinAbonnement())) {
+                    return true;
+
+                //idem que le premier pour la fin
+                } else if (finFormAbo.isBefore(abonnement.getFinAbonnement())&&finFormAbo.isAfter(abonnement.getDebutAbonnement())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
 }

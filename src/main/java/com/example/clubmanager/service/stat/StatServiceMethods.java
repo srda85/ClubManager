@@ -44,22 +44,24 @@ public class StatServiceMethods {
 
     public Statistic findStatToUpdate (LocalDate date){
         List<Statistic>statisticList=statisticRepository.findAll();
-
+        Statistic statToReturn = null;
+        if (statisticList.isEmpty())statToReturn=new Statistic();
         for (Statistic stat:statisticList) {
             if(statMoisAnneeExiste(date.getYear(),date.getMonthValue())){
-                return statisticList.stream()
+                statToReturn = statisticList.stream()
                         .filter(statistic -> statistic.getMonth()== date.getMonthValue()&&statistic.getAnnee()==date.getYear())
                         .toList().get(0);
             }else {
-                return new Statistic();
+                statToReturn = new Statistic();
             }
         }
+        return statToReturn;
         //Ajuster ici je pense que je peux enlever cette partie
-        List<Statistic>statTrie=statisticList.stream()
-                .filter(statistic -> statistic.getMonth()== date.getMonthValue()&&statistic.getAnnee()==date.getYear())
-                .toList();
-        if (statTrie.get(0)==null)return null;
-        else return statTrie.get(0);
+//        List<Statistic>statTrie=statisticList.stream()
+//                .filter(statistic -> statistic.getMonth()== date.getMonthValue()&&statistic.getAnnee()==date.getYear())
+//                .toList();
+//        if (statTrie.get(0)==null)return null;
+//        else return statTrie.get(0);
     }
 
     public Integer getMontantTotalMensuel(LocalDate date){

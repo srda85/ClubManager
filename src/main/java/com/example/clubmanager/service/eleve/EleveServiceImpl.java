@@ -12,6 +12,7 @@ import com.example.clubmanager.service.stat.StatisticScheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -65,6 +66,7 @@ public class EleveServiceImpl implements EleveService{
             throw new IllegalArgumentException("eleve inséré peut pas etre null");
         //retourner le dto n'est pas obligatoire on pourrait le faire avec un void
         Eleve eleve = eleveMapper.toEntity(form);
+        eleve.setDateCreationFiche(LocalDate.now());
         EleveDTO eleveDTO = eleveMapper.toDTO(eleve);
         eleveRepository.saveAndFlush(eleve);
 
